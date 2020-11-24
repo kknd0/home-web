@@ -1,0 +1,12 @@
+query Me {
+	me {
+		user {
+			username
+			id
+		}
+		errors {
+			message
+			field
+		}
+	}
+}
