@@ -1,9 +1,7 @@
-mutation Login($options: UsernamePasswordInput!) {
-	login(options: $options) {
+mutation Login($usernameOrPhone: String!, $password: String!) {
+	login(usernameOrPhone: $usernameOrPhone, password: $password) {
 		user {
-			id
-			createdAt
-			username
+			...RegularUser
 		}
 		errors {
 			field
