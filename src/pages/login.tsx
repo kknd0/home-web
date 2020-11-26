@@ -38,8 +38,8 @@ const login: React.FC<loginProps> = () => {
 							<Box mt={4}>
 								<InputField
 									name='password'
-									placeholder='password'
-									label='password'
+									placeholder='请输入密码'
+									label='密码'
 									type='password'
 								/>
 							</Box>

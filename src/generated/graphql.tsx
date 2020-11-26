@@ -14,22 +14,14 @@ export type Scalars = {
 
 export type Query = {
   __typename?: 'Query';
+  me?: Maybe<User>;
   posts: Array<Post>;
   post?: Maybe<Post>;
-  me?: Maybe<User>;
 };
 
 
 export type QueryPostArgs = {
   id: Scalars['String'];
-};
-
-export type Post = {
-  __typename?: 'Post';
-  id: Scalars['String'];
-  createdAt: Scalars['String'];
-  updatedAt: Scalars['String'];
-  title: Scalars['String'];
 };
 
 export type User = {
@@ -41,15 +33,58 @@ export type User = {
   phone: Scalars['String'];
 };
 
+export type Post = {
+  __typename?: 'Post';
+  id: Scalars['String'];
+  createdAt: Scalars['String'];
+  updatedAt: Scalars['String'];
+  title: Scalars['String'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
+  forgetPassword: Scalars['Boolean'];
+  register: UserResponse;
+  sendPhoneLoginToken: UserResponse;
+  phoneLogin: UserResponse;
+  sendPhoneRegisterToken: UserResponse;
+  login: UserResponse;
+  logout: Scalars['Boolean'];
   createPost: Post;
   updatePost: Post;
   deletePost: Scalars['Boolean'];
-  forgetPassword: Scalars['Boolean'];
-  register: UserResponse;
-  login: UserResponse;
-  logout: Scalars['Boolean'];
+};
+
+
+export type MutationForgetPasswordArgs = {
+  phone: Scalars['String'];
+};
+
+
+export type MutationRegisterArgs = {
+  options: UsernamePasswordInput;
+};
+
+
+export type MutationSendPhoneLoginTokenArgs = {
+  phone: Scalars['String'];
+};
+
+
+export type MutationPhoneLoginArgs = {
+  phoneLoginToken: Scalars['String'];
+  phone: Scalars['String'];
+};
+
+
+export type MutationSendPhoneRegisterTokenArgs = {
+  phone: Scalars['String'];
+};
+
+
+export type MutationLoginArgs = {
+  password: Scalars['String'];
+  usernameOrPhone: Scalars['String'];
 };
 
 
@@ -66,22 +101,6 @@ export type MutationUpdatePostArgs = {
 
 export type MutationDeletePostArgs = {
   id: Scalars['String'];
-};
-
-
-export type MutationForgetPasswordArgs = {
-  phone: Scalars['String'];
-};
-
-
-export type MutationRegisterArgs = {
-  options: UsernamePasswordInput;
-};
-
-
-export type MutationLoginArgs = {
-  password: Scalars['String'];
-  usernameOrPhone: Scalars['String'];
 };
 
 export type UserResponse = {
@@ -135,6 +154,26 @@ export type LogoutMutation = (
   & Pick<Mutation, 'logout'>
 );
 
+export type PhoneLoginMutationVariables = Exact<{
+  phone: Scalars['String'];
+  phoneLoginToken: Scalars['String'];
+}>;
+
+
+export type PhoneLoginMutation = (
+  { __typename?: 'Mutation' }
+  & { phoneLogin: (
+    { __typename?: 'UserResponse' }
+    & { user?: Maybe<(
+      { __typename?: 'User' }
+      & Pick<User, 'username' | 'phone' | 'id'>
+    )>, errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & Pick<FieldError, 'field' | 'message'>
+    )>> }
+  ) }
+);
+
 export type RegisterMutationVariables = Exact<{
   options: UsernamePasswordInput;
 }>;
@@ -148,6 +187,22 @@ export type RegisterMutation = (
       { __typename?: 'User' }
       & RegularUserFragment
     )>, errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & Pick<FieldError, 'field' | 'message'>
+    )>> }
+  ) }
+);
+
+export type SendPhoneLoginTokenMutationVariables = Exact<{
+  phone: Scalars['String'];
+}>;
+
+
+export type SendPhoneLoginTokenMutation = (
+  { __typename?: 'Mutation' }
+  & { sendPhoneLoginToken: (
+    { __typename?: 'UserResponse' }
+    & { errors?: Maybe<Array<(
       { __typename?: 'FieldError' }
       & Pick<FieldError, 'field' | 'message'>
     )>> }
@@ -208,6 +263,25 @@ export const LogoutDocument = gql`
 export function useLogoutMutation() {
   return Urql.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument);
 };
+export const PhoneLoginDocument = gql`
+    mutation PhoneLogin($phone: String!, $phoneLoginToken: String!) {
+  phoneLogin(phone: $phone, phoneLoginToken: $phoneLoginToken) {
+    user {
+      username
+      phone
+      id
+    }
+    errors {
+      field
+      message
+    }
+  }
+}
+    `;
+
+export function usePhoneLoginMutation() {
+  return Urql.useMutation<PhoneLoginMutation, PhoneLoginMutationVariables>(PhoneLoginDocument);
+};
 export const RegisterDocument = gql`
     mutation Register($options: UsernamePasswordInput!) {
   register(options: $options) {
@@ -224,6 +298,20 @@ export const RegisterDocument = gql`
 
 export function useRegisterMutation() {
   return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
+};
+export const SendPhoneLoginTokenDocument = gql`
+    mutation SendPhoneLoginToken($phone: String!) {
+  sendPhoneLoginToken(phone: $phone) {
+    errors {
+      field
+      message
+    }
+  }
+}
+    `;
+
+export function useSendPhoneLoginTokenMutation() {
+  return Urql.useMutation<SendPhoneLoginTokenMutation, SendPhoneLoginTokenMutationVariables>(SendPhoneLoginTokenDocument);
 };
 export const MeDocument = gql`
     query Me {
