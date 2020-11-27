@@ -6,18 +6,21 @@ import React, { useEffect, useState } from 'react'
 import { InputField } from '../components/InputField'
 import { Wapper } from '../components/Wapper'
 import {
-	usePhoneLoginMutation,
-	useSendPhoneLoginTokenMutation,
+	usePhoneRegisterMutation,
+	useSendPhoneRegisterTokenMutation,
 } from '../generated/graphql'
 import { createUrqlClient } from '../utls/createUrqlClient'
 import { toErrorMap } from '../utls/toErrorMap'
-interface loginProps {}
+interface phoneRegisterProps {}
 
-const login: React.FC<loginProps> = () => {
+const phoneRegister: React.FC<phoneRegisterProps> = () => {
 	const router = useRouter()
 	const [counter, setCounter] = useState(-1)
-	const [{ fetching }, login] = usePhoneLoginMutation()
-	const [{ fetching: fetchingToken }, sendToken] = useSendPhoneLoginTokenMutation()
+	const [{ fetching }, register] = usePhoneRegisterMutation()
+	const [
+		{ fetching: fetchingToken },
+		sendToken,
+	] = useSendPhoneRegisterTokenMutation()
 	useEffect(() => {
 		const timer = counter > 0 && setInterval(() => setCounter(counter - 1), 1000)
 		return () => clearInterval(timer as NodeJS.Timeout)
@@ -30,14 +33,14 @@ const login: React.FC<loginProps> = () => {
 			<Formik
 				initialValues={{ phone: '', token: '' }}
 				onSubmit={async (values, { setErrors }) => {
-					const response = await login({
+					const response = await register({
 						phone: values.phone,
-						phoneLoginToken: values.token,
+						phoneRegisterToken: values.token,
 					})
-					if (response.data?.phoneLogin.errors) {
-						setErrors(toErrorMap(response.data.phoneLogin.errors))
-					} else if (response.data?.phoneLogin.user) {
-						router.push((router.query.next as string) || '/')
+					if (response.data?.phoneRegister.errors) {
+						setErrors(toErrorMap(response.data.phoneRegister.errors))
+					} else if (response.data?.phoneRegister.user) {
+						router.push('/')
 					}
 				}}
 			>
@@ -57,14 +60,15 @@ const login: React.FC<loginProps> = () => {
 									onClick={async () => {
 										console.log({ phone })
 										const response = await sendToken({ phone })
-										if (response.data?.sendPhoneLoginToken.errors) {
+										if (response.data?.sendPhoneRegisterToken.errors) {
 											if (
-												response.data.sendPhoneLoginToken.errors[0].message === 'ok'
+												response.data.sendPhoneRegisterToken.errors[0].message ===
+												'ok'
 											) {
 												return setCounter(60)
 											}
 											return setErrors(
-												toErrorMap(response.data.sendPhoneLoginToken.errors)
+												toErrorMap(response.data.sendPhoneRegisterToken.errors)
 											)
 										}
 									}}
@@ -97,5 +101,5 @@ const login: React.FC<loginProps> = () => {
 	)
 }
 
-// export default login
-export default withUrqlClient(createUrqlClient)(login)
+// export default register
+export default withUrqlClient(createUrqlClient)(phoneRegister)

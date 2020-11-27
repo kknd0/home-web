@@ -7,6 +7,7 @@ import {
 	RegisterMutation,
 } from './../generated/graphql'
 import { betterUpdateQuery } from './betterUpdateQuery'
+import { errorExchange } from './globalCatchErrors'
 
 export const createUrqlClient = (ssrExchange: any) => ({
 	url: 'http://localhost:4000/graphql',
@@ -62,6 +63,7 @@ export const createUrqlClient = (ssrExchange: any) => ({
 				},
 			},
 		}),
+		errorExchange,
 		ssrExchange,
 		fetchExchange,
 	],

@@ -1,13 +1,10 @@
 import { NextPage } from 'next'
+import { useRouter } from 'next/router'
 
-const changePassword: NextPage<{ token: string }> = ({ token }) => {
-	return <div>token is {token}</div>
-}
-
-changePassword.getInitialProps = ({ query }) => {
-	return {
-		token: query.token as string,
-	}
+const changePassword: NextPage<{ token: string }> = () => {
+	const router = useRouter()
+	const { token } = router.query
+	return <div>token is {token as string}</div>
 }
 
 export default changePassword

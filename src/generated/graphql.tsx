@@ -45,11 +45,12 @@ export type Mutation = {
   __typename?: 'Mutation';
   forgetPassword: Scalars['Boolean'];
   register: UserResponse;
+  login: UserResponse;
+  logout: Scalars['Boolean'];
   sendPhoneLoginToken: UserResponse;
   phoneLogin: UserResponse;
   sendPhoneRegisterToken: UserResponse;
-  login: UserResponse;
-  logout: Scalars['Boolean'];
+  phoneRegister: UserResponse;
   createPost: Post;
   updatePost: Post;
   deletePost: Scalars['Boolean'];
@@ -63,6 +64,12 @@ export type MutationForgetPasswordArgs = {
 
 export type MutationRegisterArgs = {
   options: UsernamePasswordInput;
+};
+
+
+export type MutationLoginArgs = {
+  password: Scalars['String'];
+  usernameOrPhone: Scalars['String'];
 };
 
 
@@ -82,9 +89,9 @@ export type MutationSendPhoneRegisterTokenArgs = {
 };
 
 
-export type MutationLoginArgs = {
-  password: Scalars['String'];
-  usernameOrPhone: Scalars['String'];
+export type MutationPhoneRegisterArgs = {
+  phoneRegisterToken: Scalars['String'];
+  phone: Scalars['String'];
 };
 
 
@@ -174,6 +181,26 @@ export type PhoneLoginMutation = (
   ) }
 );
 
+export type PhoneRegisterMutationVariables = Exact<{
+  phone: Scalars['String'];
+  phoneRegisterToken: Scalars['String'];
+}>;
+
+
+export type PhoneRegisterMutation = (
+  { __typename?: 'Mutation' }
+  & { phoneRegister: (
+    { __typename?: 'UserResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & Pick<FieldError, 'field' | 'message'>
+    )>>, user?: Maybe<(
+      { __typename?: 'User' }
+      & Pick<User, 'username' | 'phone'>
+    )> }
+  ) }
+);
+
 export type RegisterMutationVariables = Exact<{
   options: UsernamePasswordInput;
 }>;
@@ -201,6 +228,22 @@ export type SendPhoneLoginTokenMutationVariables = Exact<{
 export type SendPhoneLoginTokenMutation = (
   { __typename?: 'Mutation' }
   & { sendPhoneLoginToken: (
+    { __typename?: 'UserResponse' }
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & Pick<FieldError, 'field' | 'message'>
+    )>> }
+  ) }
+);
+
+export type SendPhoneRegisterTokenMutationVariables = Exact<{
+  phone: Scalars['String'];
+}>;
+
+
+export type SendPhoneRegisterTokenMutation = (
+  { __typename?: 'Mutation' }
+  & { sendPhoneRegisterToken: (
     { __typename?: 'UserResponse' }
     & { errors?: Maybe<Array<(
       { __typename?: 'FieldError' }
@@ -282,6 +325,24 @@ export const PhoneLoginDocument = gql`
 export function usePhoneLoginMutation() {
   return Urql.useMutation<PhoneLoginMutation, PhoneLoginMutationVariables>(PhoneLoginDocument);
 };
+export const PhoneRegisterDocument = gql`
+    mutation PhoneRegister($phone: String!, $phoneRegisterToken: String!) {
+  phoneRegister(phone: $phone, phoneRegisterToken: $phoneRegisterToken) {
+    errors {
+      field
+      message
+    }
+    user {
+      username
+      phone
+    }
+  }
+}
+    `;
+
+export function usePhoneRegisterMutation() {
+  return Urql.useMutation<PhoneRegisterMutation, PhoneRegisterMutationVariables>(PhoneRegisterDocument);
+};
 export const RegisterDocument = gql`
     mutation Register($options: UsernamePasswordInput!) {
   register(options: $options) {
@@ -312,6 +373,20 @@ export const SendPhoneLoginTokenDocument = gql`
 
 export function useSendPhoneLoginTokenMutation() {
   return Urql.useMutation<SendPhoneLoginTokenMutation, SendPhoneLoginTokenMutationVariables>(SendPhoneLoginTokenDocument);
+};
+export const SendPhoneRegisterTokenDocument = gql`
+    mutation SendPhoneRegisterToken($phone: String!) {
+  sendPhoneRegisterToken(phone: $phone) {
+    errors {
+      field
+      message
+    }
+  }
+}
+    `;
+
+export function useSendPhoneRegisterTokenMutation() {
+  return Urql.useMutation<SendPhoneRegisterTokenMutation, SendPhoneRegisterTokenMutationVariables>(SendPhoneRegisterTokenDocument);
 };
 export const MeDocument = gql`
     query Me {

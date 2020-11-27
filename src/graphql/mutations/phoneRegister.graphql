@@ -1,0 +1,12 @@
+mutation PhoneRegister($phone: String!, $phoneRegisterToken: String!) {
+	phoneRegister(phone: $phone, phoneRegisterToken: $phoneRegisterToken) {
+		errors {
+			field
+			message
+		}
+		user {
+			username
+			phone
+		}
+	}
+}

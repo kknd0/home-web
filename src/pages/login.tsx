@@ -13,6 +13,7 @@ interface loginProps {}
 const login: React.FC<loginProps> = () => {
 	const router = useRouter()
 	const [, login] = useLoginMutation()
+
 	return (
 		<Wapper variant='small'>
 			<Formik
@@ -23,7 +24,7 @@ const login: React.FC<loginProps> = () => {
 					if (response.data?.login.errors) {
 						setErrors(toErrorMap(response.data.login.errors))
 					} else if (response.data?.login.user) {
-						router.push('/')
+						router.push((router.query.next as string) || '/')
 					}
 				}}
 			>
