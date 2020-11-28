@@ -16,7 +16,7 @@ interface loginProps {}
 const login: React.FC<loginProps> = () => {
 	const router = useRouter()
 	const [counter, setCounter] = useState(-1)
-	const [{ fetching }, login] = usePhoneLoginMutation()
+	const [, login] = usePhoneLoginMutation()
 	const [{ fetching: fetchingToken }, sendToken] = useSendPhoneLoginTokenMutation()
 	useEffect(() => {
 		const timer = counter > 0 && setInterval(() => setCounter(counter - 1), 1000)

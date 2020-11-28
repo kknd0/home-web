@@ -20,6 +20,12 @@ export type Query = {
 };
 
 
+export type QueryPostsArgs = {
+  page?: Maybe<Scalars['Float']>;
+  limit?: Maybe<Scalars['Float']>;
+};
+
+
 export type QueryPostArgs = {
   id: Scalars['String'];
 };
@@ -31,14 +37,27 @@ export type User = {
   updatedAt: Scalars['String'];
   username: Scalars['String'];
   phone: Scalars['String'];
+  posts: Array<Post>;
+  updoots: Array<Updoot>;
 };
 
 export type Post = {
   __typename?: 'Post';
   id: Scalars['String'];
+  title: Scalars['String'];
+  points: Scalars['Float'];
+  creator: User;
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
-  title: Scalars['String'];
+  updoots: Array<Updoot>;
+  textSnippet: Scalars['String'];
+};
+
+export type Updoot = {
+  __typename?: 'Updoot';
+  id: Scalars['String'];
+  user: User;
+  post: User;
 };
 
 export type Mutation = {
@@ -96,7 +115,7 @@ export type MutationPhoneRegisterArgs = {
 
 
 export type MutationCreatePostArgs = {
-  title: Scalars['String'];
+  input: PostInput;
 };
 
 
@@ -126,6 +145,11 @@ export type UsernamePasswordInput = {
   username: Scalars['String'];
   password: Scalars['String'];
   phone: Scalars['String'];
+};
+
+export type PostInput = {
+  title: Scalars['String'];
+  text: Scalars['String'];
 };
 
 export type RegularUserFragment = (
@@ -173,7 +197,7 @@ export type PhoneLoginMutation = (
     { __typename?: 'UserResponse' }
     & { user?: Maybe<(
       { __typename?: 'User' }
-      & Pick<User, 'username' | 'phone' | 'id'>
+      & RegularUserFragment
     )>, errors?: Maybe<Array<(
       { __typename?: 'FieldError' }
       & Pick<FieldError, 'field' | 'message'>
@@ -191,13 +215,13 @@ export type PhoneRegisterMutation = (
   { __typename?: 'Mutation' }
   & { phoneRegister: (
     { __typename?: 'UserResponse' }
-    & { errors?: Maybe<Array<(
+    & { user?: Maybe<(
+      { __typename?: 'User' }
+      & RegularUserFragment
+    )>, errors?: Maybe<Array<(
       { __typename?: 'FieldError' }
       & Pick<FieldError, 'field' | 'message'>
-    )>>, user?: Maybe<(
-      { __typename?: 'User' }
-      & Pick<User, 'username' | 'phone'>
-    )> }
+    )>> }
   ) }
 );
 
@@ -259,7 +283,7 @@ export type MeQuery = (
   { __typename?: 'Query' }
   & { me?: Maybe<(
     { __typename?: 'User' }
-    & RegularUserFragment
+    & Pick<User, 'id' | 'username'>
   )> }
 );
 
@@ -310,9 +334,7 @@ export const PhoneLoginDocument = gql`
     mutation PhoneLogin($phone: String!, $phoneLoginToken: String!) {
   phoneLogin(phone: $phone, phoneLoginToken: $phoneLoginToken) {
     user {
-      username
-      phone
-      id
+      ...RegularUser
     }
     errors {
       field
@@ -320,7 +342,7 @@ export const PhoneLoginDocument = gql`
     }
   }
 }
-    `;
+    ${RegularUserFragmentDoc}`;
 
 export function usePhoneLoginMutation() {
   return Urql.useMutation<PhoneLoginMutation, PhoneLoginMutationVariables>(PhoneLoginDocument);
@@ -328,17 +350,16 @@ export function usePhoneLoginMutation() {
 export const PhoneRegisterDocument = gql`
     mutation PhoneRegister($phone: String!, $phoneRegisterToken: String!) {
   phoneRegister(phone: $phone, phoneRegisterToken: $phoneRegisterToken) {
+    user {
+      ...RegularUser
+    }
     errors {
       field
       message
     }
-    user {
-      username
-      phone
-    }
   }
 }
-    `;
+    ${RegularUserFragmentDoc}`;
 
 export function usePhoneRegisterMutation() {
   return Urql.useMutation<PhoneRegisterMutation, PhoneRegisterMutationVariables>(PhoneRegisterDocument);
@@ -391,10 +412,11 @@ export function useSendPhoneRegisterTokenMutation() {
 export const MeDocument = gql`
     query Me {
   me {
-    ...RegularUser
+    id
+    username
   }
 }
-    ${RegularUserFragmentDoc}`;
+    `;
 
 export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });

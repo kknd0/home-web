@@ -1,12 +1,11 @@
 mutation PhoneRegister($phone: String!, $phoneRegisterToken: String!) {
 	phoneRegister(phone: $phone, phoneRegisterToken: $phoneRegisterToken) {
+		user {
+			...RegularUser
+		}
 		errors {
 			field
 			message
-		}
-		user {
-			username
-			phone
 		}
 	}
 }

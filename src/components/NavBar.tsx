@@ -6,8 +6,8 @@ interface NavBarProps {}
 
 export const NavBar: React.FC<NavBarProps> = () => {
 	const [{ data, fetching }] = useMeQuery()
+
 	const [{ fetching: logOutFetching }, logout] = useLogoutMutation()
-	//!冒号后重命名
 	let body = null
 	if (fetching) {
 		body = null

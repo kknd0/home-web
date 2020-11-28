@@ -1,9 +1,7 @@
 mutation PhoneLogin($phone: String!, $phoneLoginToken: String!) {
 	phoneLogin(phone: $phone, phoneLoginToken: $phoneLoginToken) {
 		user {
-			username
-			phone
-			id
+			...RegularUser
 		}
 		errors {
 			field
